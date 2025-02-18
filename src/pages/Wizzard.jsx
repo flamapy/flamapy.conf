@@ -3,7 +3,8 @@ import CustomButton from "../components/CustomButton";
 import Question from "../components/Question";
 import { useNavigate } from "react-router-dom";
 
-function Wizzard() {
+// eslint-disable-next-line react/prop-types
+function Wizzard({cancelURL = '/'}) {
   const navigate = useNavigate();
 
   // Mock update handler
@@ -115,8 +116,11 @@ function Wizzard() {
       <div className="flex justify-between p-4">
         <CustomButton
           onClick={() => {
-            navigate("/");
-          }}
+            if (cancelURL.startsWith("http")) {
+              window.location.href = cancelURL; // Redirects to external URL
+            } else {
+              navigate(cancelURL); // Internal navigation
+            }}}
         >
           Cancel
         </CustomButton>

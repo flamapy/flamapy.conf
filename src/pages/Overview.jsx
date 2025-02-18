@@ -1,7 +1,7 @@
 import CustomButton from "../components/CustomButton";
 import { useNavigate } from "react-router-dom";
 
-function Overview() {
+function Overview({applyURL = '/end'}) {
   const navigate = useNavigate();
   const text = `Cultivo
 \u2937 Lechuga
@@ -56,7 +56,7 @@ Sincronización
           </CustomButton>
           <CustomButton
             onClick={() => {
-              navigate("/end");
+              navigate(applyURL);
             }}
           >
             Apply
