@@ -1,8 +1,15 @@
+/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
 
-function Home() {
+function Home({setSelectedFile}) {
   const navigate = useNavigate();
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
   return (
     <div className="bg-neutral-300 flex flex-col items-center justify-center h-screen rounded-2xl m-2 p-4 gap-4">
@@ -12,7 +19,13 @@ function Home() {
       </p>
 
       {/* Botón para subir modelo */}
-      <CustomButton onClick={null}>Upload Model</CustomButton>
+      <input
+          type="file"
+          id="fileInput"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+      <CustomButton onClick={() => document.getElementById("fileInput").click()}>Upload Model</CustomButton>
 
       {/* Selección del formato */}
       <p className="text-lg font-semibold">Select configuration format</p>

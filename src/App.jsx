@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
@@ -11,13 +12,15 @@ const cancelURL = appMode === 'embed' ? import.meta.env.VITE_CANCEL_CONFIGURATIO
 const applyURL = appMode === 'embed' ? import.meta.env.VITE_APPLY_CONFIGURATION_URL: null
 
 function App() {
+  const [selectedFile, setSelectedFile] = useState(null);
+
   return (
-    <BrowserRouter basename="/configurator">
+    <BrowserRouter basename="/">
       <div className="h-screen w-screen flex flex-col max-h-screen">
         <Navbar />
         <Routes>
-          {appMode === 'full' && <Route path="/" element={<Home />}></Route>}
-          <Route path="/wizzard" element={<Wizzard cancelURL={cancelURL} />}></Route>
+          {appMode === 'full' && <Route path="/" element={<Home setSelectedFile={setSelectedFile} />}></Route>}
+          <Route path="/wizzard" element={<Wizzard cancelURL={cancelURL} selectedFile={selectedFile} />}></Route>
           <Route path="/overview" element={<Overview applyURL={applyURL}/>}></Route>
           {appMode === 'full' && <Route path="/end" element={<End />}></Route>}
         </Routes>

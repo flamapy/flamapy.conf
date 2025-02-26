@@ -1,14 +1,88 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from "react";
 import CustomButton from "../components/CustomButton";
 import Question from "../components/Question";
 import { useNavigate } from "react-router-dom";
 
-// eslint-disable-next-line react/prop-types
-function Wizzard({cancelURL = '/'}) {
+function Wizzard({cancelURL = '/', selectedFile}) {
+  const [worker, setWorker] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isImported, setIsImported] = useState(false);
+  const [output, setOutput] = useState('');
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState({})
+
   const navigate = useNavigate();
 
+  function initializeWorker() {
+    const flamapyWorker = new Worker("/webworker.js");
+    flamapyWorker.onmessage = (event) => {
+      if (event.data.status === "loaded") {
+        setIsLoaded(true);
+        setOutput('flamapy ready')
+        setOutput(selectedFile.name)
+      } else {setOutput('flamapy error')}
+    };
+    setWorker(flamapyWorker);
+    return flamapyWorker;
+  }
+
+  useEffect(() => {
+    try {
+      const flamapyWorker = initializeWorker();
+      return () => {
+        flamapyWorker.terminate();
+      };
+    } catch (error) {
+      setOutput(error.toString());
+    }
+  }, []);
+
+  useEffect(()=>{ 
+    console.log(output);
+  }, [output])
+
+  useEffect(() => {
+    if (selectedFile && isLoaded) {
+      const reader = new FileReader();
+      const fileName = selectedFile.name;
+      const extensionIndexStart = fileName.indexOf(".") + 1;
+      const fileExtension = fileName.substring(
+        extensionIndexStart,
+        fileName.length
+      );
+      reader.onload = (e) => {
+        const fileContent = e.target.result;
+        
+        worker.postMessage({
+          action: "importModel",
+          data: { fileContent, fileExtension },
+        });
+
+        worker.onmessage = async (event) => {
+          if (event.data.results !== undefined) {
+            setIsImported(true);
+            setOutput('model imported')
+          } else if (event.data.error) {
+            if (event.data.error.includes("not_supported")) {
+              setOutput("Import error The provided file extension is not a supported model. Please try with a model in one of the following types: .gfm.json, .afm, .fide, .json, .xml or .uvl");
+            } else {
+              setOutput({
+                label: "Import error",
+                result: `There was an error when trying to import the model. Please make sure that the model is valid, and try again.`,
+              });
+            }
+            setIsImported(true);
+          }
+        };
+        
+      };
+      reader.readAsText(selectedFile);
+    }
+  }, [isLoaded, worker, selectedFile]);
+
+
   // Mock update handler
-  const [questionIndex, setQuestionIndex] = useState(0);
   const handleUpdate = (selected) => {
     console.log("Selected options:", selected);
   };
