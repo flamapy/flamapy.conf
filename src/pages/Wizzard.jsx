@@ -75,12 +75,26 @@ function Wizzard({cancelURL = '/', selectedFile}) {
             setIsImported(true);
           }
         };
-        
       };
       reader.readAsText(selectedFile);
     }
   }, [isLoaded, worker, selectedFile]);
 
+  useEffect(()=>{ 
+    if (isImported) {
+      worker.postMessage({
+          action: "startConfigurator",
+          data: null,
+        });
+      
+      worker.onmessage = async (event) => {
+          if (event.data.results !== undefined) {
+            setOutput(event.data.results)
+          }
+        };
+    }
+    console.log(output);
+  }, [isImported])
 
   // Mock update handler
   const handleUpdate = (selected) => {

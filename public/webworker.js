@@ -21,9 +21,12 @@ self.onmessage = async (event) => {
         data.fileExtension,
         data.fileContent
       );
+    } else if (action ==="startConfigurator") {
+      results = await self.flamapy.startConfigurator();
+    }
 
     self.postMessage({ results, action });
-    }
+
   } catch (error) {
     console.error(error);
     self.postMessage({ error: error.message, action });

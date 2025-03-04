@@ -29,6 +29,7 @@ class Flamapy {
   await micropip.install("flamapy/uvlparser-2.0.1-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/afmparser-1.0.3-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/antlr4_python3_runtime-4.13.1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_configurator-2.0.1-py3-none-any.whl", deps=False)
   `);
     await pyodideInstance.runPythonAsync(await pythonFile.text());
     pyodideInstance.FS.mkdir("export");
@@ -43,6 +44,12 @@ class Flamapy {
   execute_import_transformation('${fileExtension}', file_content)
         `
     );
+    return result;
+  }
+
+  async startConfigurator() {
+    const result = await this.pyodide.runPythonAsync(`
+  start_configurator()`);
     return result;
   }
 }

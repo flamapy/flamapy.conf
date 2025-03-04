@@ -1,13 +1,7 @@
 import json, os
-from flamapy.interfaces.python import FLAMAFeatureModel
-from flamapy.core.exceptions import FlamaException
-from antlr4 import CommonTokenStream, FileStream
-from uvl.UVLCustomLexer import UVLCustomLexer
-from uvl.UVLPythonParser import UVLPythonParser
-from antlr4.error.ErrorListener import ErrorListener
 from flamapy.core.discover import DiscoverMetamodels
-from flamapy.metamodels.fm_metamodel.transformations import GlencoeReader, AFMReader, FeatureIDEReader, JSONReader, XMLReader, UVLReader, GlencoeWriter
-from flamapy.metamodels.configuration_metamodel.models import Configuration
+from flamapy.metamodels.fm_metamodel.transformations import GlencoeReader, AFMReader, FeatureIDEReader, JSONReader, XMLReader, UVLReader
+from flamapy.metamodels.configurator_metamodel.transformation import FmToConfigurator
 from collections import defaultdict
 
 fm = None
@@ -39,11 +33,10 @@ def execute_import_transformation(file_extension: str, file_content: str):
             os.remove("import.uvl")
     
     if(feature_model):
-        result = dm.use_transformation_m2t(feature_model,'import.uvl')
         global fm
-        fm = result
+        fm = feature_model
         os.remove("import.uvl")
-        return result
+        return True
     else:
         raise Exception("not_supported")
 
