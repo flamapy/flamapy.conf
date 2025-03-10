@@ -10,7 +10,6 @@ configurator = None
 def execute_import_transformation(file_extension: str, file_content: str):
     with open("import.{}".format(file_extension), "w") as text_file:
         text_file.write(file_content)
-    dm = DiscoverMetamodels()
     feature_model = False
     match(file_extension):
         case 'gfm.json':
@@ -35,7 +34,6 @@ def execute_import_transformation(file_extension: str, file_content: str):
     if(feature_model):
         global fm
         fm = feature_model
-        os.remove("import.uvl")
         return True
     else:
         raise Exception("not_supported")
@@ -44,8 +42,10 @@ def start_configurator():
     global configurator
     configurator = FmToConfigurator(fm).transform()
     configurator.start()
-    first_question = configurator.get_current_question()
-    options = configurator.get_possible_options()
-    result = {'question': first_question.name, 'options': [opt.name for opt in options ]}
+    
+    return json.dumps(configurator.get_current_status())
 
-    return json.dumps(result)
+def answer_question(answer):
+    configurator.answer_question(answer)
+
+    return json.dumps(configurator.get_current_status())

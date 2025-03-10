@@ -42,15 +42,15 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
       {questionType === "optional" || questionType === "or" ? (
         // Multiple selection (checkboxes)
         <div>
-          {options.map((option, index) => (
+          {options?.map((option, index) => (
             <label key={index} className="flex items-center gap-2">
               <input
                 type="checkbox"
-                value={option}
+                value={option.id}
                 checked={selected.includes(option)}
                 onChange={() => handleChange(option)}
               />
-              {option}
+              {option.name}
             </label>
           ))}
           {isOrInvalid && (
@@ -62,16 +62,16 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
       ) : questionType === "alternative" && options.length <= 4 ? (
         // Single selection (radio buttons)
         <div>
-          {options.map((option, index) => (
+          {options?.map((option, index) => (
             <label key={index} className="flex items-center gap-2">
               <input
                 type="radio"
                 name="alternative"
-                value={option}
+                value={option.id}
                 checked={selected === option}
                 onChange={() => handleChange(option)}
               />
-              {option}
+              {option.name}
             </label>
           ))}
         </div>
@@ -85,9 +85,9 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
           <option value="" disabled>
             Select an option
           </option>
-          {options.map((option, index) => (
-            <option key={index} value={option}>
-              {option}
+          {options?.map((option, index) => (
+            <option key={index} value={option.id}>
+              {option.name}
             </option>
           ))}
         </select>

@@ -50,6 +50,6 @@ class Flamapy {
   async startConfigurator() {
     const result = await this.pyodide.runPythonAsync(`
   start_configurator()`);
-    return result;
+    return JSON.parse(result);
   }
 }
