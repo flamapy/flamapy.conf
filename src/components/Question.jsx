@@ -1,9 +1,8 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 
 function Question({ title, options, questionType, propagation, onUpdate }) {
-  const [selected, setSelected] = useState(
-    questionType === "optional" || questionType === "or" ? [] : ""
-  );
+  const [selected, setSelected] = useState([]);
 
   // Handle selection updates
   const handleChange = (value) => {
@@ -16,8 +15,8 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
       onUpdate(newSelected);
     } else if (questionType === "alternative") {
       // Allow single selection
-      setSelected(value);
-      onUpdate(value);
+      setSelected([value]);
+      onUpdate([value]);
     }
   };
 
@@ -47,8 +46,8 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
               <input
                 type="checkbox"
                 value={option.id}
-                checked={selected.includes(option)}
-                onChange={() => handleChange(option)}
+                checked={selected.includes(option.id)}
+                onChange={() => handleChange(option.id)}
               />
               {option.name}
             </label>
@@ -69,7 +68,7 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
                 name="alternative"
                 value={option.id}
                 checked={selected === option}
-                onChange={() => handleChange(option)}
+                onChange={() => handleChange(option.id)}
               />
               {option.name}
             </label>

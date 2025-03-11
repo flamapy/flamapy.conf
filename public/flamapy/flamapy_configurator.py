@@ -46,6 +46,8 @@ def start_configurator():
     return json.dumps(configurator.get_current_status())
 
 def answer_question(answer):
-    configurator.answer_question(answer)
+    valid = configurator.answer_question(answer)
+    if valid:
+        configurator.next_question()
 
     return json.dumps(configurator.get_current_status())

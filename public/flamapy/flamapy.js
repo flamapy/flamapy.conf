@@ -52,4 +52,11 @@ class Flamapy {
   start_configurator()`);
     return JSON.parse(result);
   }
+
+  async answerQuestion(answer) {
+    this.pyodide.globals.set("answer", answer);
+    const result = await this.pyodide.runPythonAsync(`
+  answer_question(answer)`);
+    return JSON.parse(result);
+  }
 }

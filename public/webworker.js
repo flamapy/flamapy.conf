@@ -10,7 +10,7 @@ let flamapyReadyPromise = loadFlamapyWorker()
 
 self.onmessage = async (event) => {
   await flamapyReadyPromise;
-  const { action, data, ...context } = event.data;  
+  const { action, data, ...context } = event.data;
   for (const key of Object.keys(context)) {
     self[key] = context[key];
   }
@@ -21,12 +21,13 @@ self.onmessage = async (event) => {
         data.fileExtension,
         data.fileContent
       );
-    } else if (action ==="startConfigurator") {
+    } else if (action === "startConfigurator") {
       results = await self.flamapy.startConfigurator();
+    } else if (action === "answerQuestion") {
+      results = await self.flamapy.answerQuestion(data);
     }
 
     self.postMessage({ results, action });
-
   } catch (error) {
     console.error(error);
     self.postMessage({ error: error.message, action });
