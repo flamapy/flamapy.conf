@@ -1,13 +1,17 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
 
-function Home({setSelectedFile}) {
+function Home({ setSelectedFile }) {
   const navigate = useNavigate();
+  const [fileName, setFileName] = useState("");
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(file);
+      setFileName(file.name);
     }
   };
 
@@ -18,33 +22,36 @@ function Home({setSelectedFile}) {
         Select the feature model to configure
       </p>
 
-      {/* Botón para subir modelo */}
       <input
-          type="file"
-          id="fileInput"
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
-      <CustomButton onClick={() => document.getElementById("fileInput").click()}>Upload Model</CustomButton>
+        type="file"
+        id="fileInput"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+      <CustomButton
+        onClick={() => document.getElementById("fileInput").click()}
+      >
+        Upload Model
+      </CustomButton>
 
-      {/* Selección del formato */}
+      {fileName && (
+        <p className="text-sm text-gray-700">Selected file: {fileName}</p>
+      )}
+
       <p className="text-lg font-semibold">Select configuration format</p>
       <select className="p-2 border rounded w-max text-white py-2 px-4 m-2 shadow-lg transition-colors duration-200 bg-[#356C99] hover:bg-[#0D486C]">
         <option defaultValue>JSON</option>
       </select>
 
-      {/* Instrucciones finales */}
       <p className="text-lg font-semibold">
         Once the configuration is finished:
       </p>
       <div className="flex flex-col gap-2">
-        {/* Descarga */}
         <div className="flex items-center gap-2">
           <input type="checkbox" id="download" name="download" />
           <label htmlFor="download">Download configuration file</label>
         </div>
 
-        {/* Enviar a */}
         <div className="flex items-center gap-2">
           <input type="checkbox" id="send" name="send" />
           <label htmlFor="send">Send to:</label>
@@ -56,7 +63,6 @@ function Home({setSelectedFile}) {
         </div>
       </div>
 
-      {/* Botón para empezar configuración */}
       <CustomButton onClick={() => navigate("/wizzard")}>
         Start Configuration
       </CustomButton>

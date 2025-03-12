@@ -12,6 +12,7 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState([]);
+  const [popUp, setPopUp] = useState(null);
 
   const navigate = useNavigate();
 
@@ -102,21 +103,24 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     console.log(output);
   }, [isImported]);
 
-  // Mock update handler
-  const handleUpdate = (selected) => {
-    console.log("Selected options:", selected);
-    setSelectedAnswer(selected);
-  };
-
   async function answerQuestion() {
     if (isImported) {
       worker.postMessage({ action: "answerQuestion", data: selectedAnswer });
 
       worker.onmessage = async (event) => {
         if (event.data.results !== undefined) {
-          console.log(event.data.results);
-
-          setCurrentQuestion(event.data.results);
+          const results = event.data.results;
+          if (results.valid) {
+            if (results.configuration) {
+              console.log(results.configuration);
+            } else {
+              setCurrentQuestion(event.data.results.nextQuestion);
+              setPopUp(null);
+            }
+          } else {
+            setPopUp({ type: "error", msg: results.contradiction.msg });
+          }
+          setSelectedAnswer([]);
         }
       };
     }
@@ -134,13 +138,22 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     <div className="flex flex-col h-screen">
       {/* Main content area */}
       <div className="bg-neutral-300 flex flex-col  flex-grow rounded-2xl m-2 p-4">
+        {popUp && (
+          <div
+            className={`${
+              popUp.type === "error" ? "bg-red-700" : "bg-green-600"
+            } w-full rounded-xl p-4 text-xl mb-2`}
+          >
+            <p className="text-lg font-semibold text-white">{popUp.msg}</p>
+          </div>
+        )}
         {currentQuestion && (
           <Question
             title={currentQuestion.currentQuestion}
             options={currentQuestion.possibleOptions}
             questionType={currentQuestion.currentQuestionType}
-            propagation={null}
-            onUpdate={handleUpdate}
+            selected={selectedAnswer}
+            onUpdate={setSelectedAnswer}
           />
         )}
       </div>
@@ -160,6 +173,7 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
         </CustomButton>
         <div>
           <CustomButton
+            active={isImported}
             onClick={() => {
               previousQuestion();
             }}
@@ -167,6 +181,7 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
             Previous
           </CustomButton>
           <CustomButton
+            active={isImported}
             onClick={() => {
               nextQuestion();
             }}

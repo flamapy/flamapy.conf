@@ -47,7 +47,17 @@ def start_configurator():
 
 def answer_question(answer):
     valid = configurator.answer_question(answer)
-    if valid:
-        configurator.next_question()
 
-    return json.dumps(configurator.get_current_status())
+    result = dict()
+    result['valid'] = valid
+    if valid:
+        if configurator.is_last_question():
+            result['configuration'] = configurator._get_configuration()
+        else:
+            configurator.next_question()
+            result['nextQuestion'] = configurator.get_current_status()
+        
+    else:
+        result['contradiction'] = {'msg': 'The selected choice is incompatible with the model definition. Please choose another option.'}
+    
+    return json.dumps(result)
