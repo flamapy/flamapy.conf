@@ -1,9 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-
-function Question({ title, options, questionType, propagation, onUpdate }) {
-  const [selected, setSelected] = useState([]);
-
+function Question({ title, options, questionType, selected, onUpdate }) {
   // Handle selection updates
   const handleChange = (value) => {
     if (questionType === "optional" || questionType === "or") {
@@ -11,11 +7,9 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
       const newSelected = selected.includes(value)
         ? selected.filter((item) => item !== value) // Remove if already selected
         : [...selected, value]; // Add if not selected
-      setSelected(newSelected);
       onUpdate(newSelected);
     } else if (questionType === "alternative") {
       // Allow single selection
-      setSelected([value]);
       onUpdate([value]);
     }
   };
@@ -28,15 +22,7 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
       <div className="bg-gray-700 w-full rounded-xl p-4 text-xl">
         <p className="text-lg font-semibold text-white">{title}</p>
       </div>
-      {propagation && (
-        <div
-          className={`${
-            propagation.type === "error" ? "bg-red-700" : "bg-green-600"
-          } w-full rounded-xl p-4 text-xl`}
-        >
-          <p className="text-lg font-semibold text-white">{propagation.msg}</p>
-        </div>
-      )}
+
       {/* Render options based on question type */}
       {questionType === "optional" || questionType === "or" ? (
         // Multiple selection (checkboxes)
@@ -67,7 +53,7 @@ function Question({ title, options, questionType, propagation, onUpdate }) {
                 type="radio"
                 name="alternative"
                 value={option.id}
-                checked={selected === option}
+                checked={selected.includes(option.id)}
                 onChange={() => handleChange(option.id)}
               />
               {option.name}
