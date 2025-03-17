@@ -12,7 +12,10 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
   const [isImported, setIsImported] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState([]);
-  const [popUp, setPopUp] = useState({ type: "info", msg: "Loading flamapy" });
+  const [popUp, setPopUp] = useState({
+    type: "info",
+    msg: `Preparing configurator for ${selectedFile.name}`,
+  });
   const [configuration, setConfiguration] = useState(null);
 
   const navigate = useNavigate();
@@ -22,10 +25,6 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     flamapyWorker.onmessage = (event) => {
       if (event.data.status === "loaded") {
         setIsLoaded(true);
-        setPopUp({
-          type: "info",
-          msg: `Preparing configurator for ${selectedFile.name}`,
-        });
       } else {
         setPopUp({
           type: "error",
@@ -148,15 +147,30 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     }
   }
 
+  function downloadConfiguration() {
+    if (!configuration) {
+      setPopUp({
+        type: "error",
+        msg: "No configuration available to download.",
+      });
+      return;
+    }
+
+    const jsonData = JSON.stringify(configuration, null, 2);
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "configuration.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   async function nextQuestion() {
-    if (isImported) {
-      if (
-        currentQuestion.currentQuestionIndex !== currentQuestion.questionNumber
-      ) {
-        await answerQuestion();
-      } else {
-        null;
-      }
+    if (isImported && currentQuestion) {
+      await answerQuestion();
+    } else {
+      downloadConfiguration();
     }
   }
 
@@ -211,7 +225,7 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
               nextQuestion();
             }}
           >
-            Next
+            {configuration ? "Download configuration" : "Next"}
           </CustomButton>
         </div>
       </div>
