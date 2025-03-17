@@ -7,7 +7,9 @@ import Wizzard from "./pages/Wizzard";
 
 const appMode = import.meta.env.VITE_FLAMAPY_CONF_MODE;
 const cancelURL =
-  appMode === "embed" ? import.meta.env.VITE_CANCEL_CONFIGURATION_URL : null;
+  appMode === "embed"
+    ? import.meta.env.VITE_CANCEL_CONFIGURATION_URL
+    : undefined;
 const applyURL =
   appMode === "embed" ? import.meta.env.VITE_APPLY_CONFIGURATION_URL : null;
 
