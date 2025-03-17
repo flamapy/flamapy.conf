@@ -1,4 +1,20 @@
 function Configuration({ configuration }) {
+  const categorizedConfig = {
+    selected: [],
+    deselected: [],
+    undecided: [],
+  };
+
+  Object.entries(configuration).forEach(([feature, status]) => {
+    if (status === true) {
+      categorizedConfig.selected.push(feature);
+    } else if (status === false) {
+      categorizedConfig.deselected.push(feature);
+    } else {
+      categorizedConfig.undecided.push(feature);
+    }
+  });
+
   return (
     <div className="bg-white w-full rounded-xl p-4 text-xl shadow-md overflow-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -8,8 +24,8 @@ function Configuration({ configuration }) {
         <div className="mb-2">
           <h3 className="font-semibold text-green-600">Selected Features:</h3>
           <ul className="list-disc list-inside text-black">
-            {configuration.selected.length > 0 ? (
-              configuration.selected.map((feature, index) => (
+            {categorizedConfig.selected.length > 0 ? (
+              categorizedConfig.selected.map((feature, index) => (
                 <li key={index}>{feature}</li>
               ))
             ) : (
@@ -21,8 +37,8 @@ function Configuration({ configuration }) {
         <div className="mb-2">
           <h3 className="font-semibold text-red-600">Deselected Features:</h3>
           <ul className="list-disc list-inside text-black">
-            {configuration.deselected.length > 0 ? (
-              configuration.deselected.map((feature, index) => (
+            {categorizedConfig.deselected.length > 0 ? (
+              categorizedConfig.deselected.map((feature, index) => (
                 <li key={index}>{feature}</li>
               ))
             ) : (
@@ -34,8 +50,8 @@ function Configuration({ configuration }) {
         <div>
           <h3 className="font-semibold text-yellow-600">Undecided Features:</h3>
           <ul className="list-disc list-inside text-black">
-            {configuration.undecided.length > 0 ? (
-              configuration.undecided.map((feature, index) => (
+            {categorizedConfig.undecided.length > 0 ? (
+              categorizedConfig.undecided.map((feature, index) => (
                 <li key={index}>{feature}</li>
               ))
             ) : (

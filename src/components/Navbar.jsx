@@ -4,7 +4,7 @@ import flamapyLogo from "../assets/flamapy_horizontal_logo_white.svg";
 
 function Navbar({ children }) {
   return (
-    <nav className="flex justify-between items-center py-4 px-6 bg-white shadow">
+    <nav className="flex flex-none justify-between items-center py-4 px-6 bg-white shadow">
       <div className="flex gap-4 items-center">
         <Link
           to="/"

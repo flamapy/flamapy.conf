@@ -10,7 +10,6 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
   const [worker, setWorker] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isImported, setIsImported] = useState(false);
-  const [questionIndex, setQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState([]);
   const [popUp, setPopUp] = useState({ type: "info", msg: "Loading flamapy" });
@@ -151,7 +150,13 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
 
   async function nextQuestion() {
     if (isImported) {
-      await answerQuestion();
+      if (
+        currentQuestion.currentQuestionIndex !== currentQuestion.questionNumber
+      ) {
+        await answerQuestion();
+      } else {
+        null;
+      }
     }
   }
 
@@ -162,9 +167,9 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex-1 overflow-hidden flex flex-col">
       {/* Main content area */}
-      <div className="bg-neutral-300 flex flex-col  flex-grow rounded-2xl m-2 p-4 max-h-full">
+      <div className="bg-neutral-300 flex flex-col flex-grow rounded-2xl m-2 p-4 overflow-auto">
         {popUp && <Information type={popUp.type} msg={popUp.msg} />}
         {currentQuestion && (
           <Question

@@ -16,7 +16,7 @@ function App() {
 
   return (
     <BrowserRouter basename="/">
-      <div className="h-screen w-screen flex flex-col max-h-screen">
+      <div className="h-screen w-screen flex flex-col">
         <Navbar />
         <Routes>
           {appMode === "full" && (
