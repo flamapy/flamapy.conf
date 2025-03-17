@@ -10,7 +10,7 @@ function Question({ title, options, questionType, selected, onUpdate }) {
       onUpdate(newSelected);
     } else if (questionType === "alternative") {
       // Allow single selection
-      onUpdate([value]);
+      onUpdate([parseInt(value)]);
     }
   };
 
@@ -63,15 +63,19 @@ function Question({ title, options, questionType, selected, onUpdate }) {
       ) : (
         // Single selection (select dropdown for 5+ options)
         <select
+          defaultValue={-1}
           className="p-2 border rounded w-max text-white py-2 px-4 m-2 shadow-lg transition-colors duration-200 bg-[#356C99] hover:bg-[#0D486C]"
-          value={selected}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(option) => handleChange(option.target.value)}
         >
-          <option value="" disabled>
+          <option value={-1} disabled>
             Select an option
           </option>
           {options?.map((option, index) => (
-            <option key={index} value={option.id}>
+            <option
+              key={index}
+              value={option.id}
+              selected={selected.includes(option.id)}
+            >
               {option.name}
             </option>
           ))}
