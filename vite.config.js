@@ -6,4 +6,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '',  // Set the base path for assets
+  server: {
+    host: '0.0.0.0'
+  }
 });

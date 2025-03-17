@@ -4,8 +4,6 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Wizzard from "./pages/Wizzard";
-import Overview from "./pages/Overview";
-import End from "./pages/End";
 
 const appMode = import.meta.env.VITE_FLAMAPY_CONF_MODE;
 const cancelURL =
@@ -33,11 +31,6 @@ function App() {
               <Wizzard cancelURL={cancelURL} selectedFile={selectedFile} />
             }
           ></Route>
-          <Route
-            path="/overview"
-            element={<Overview applyURL={applyURL} />}
-          ></Route>
-          {appMode === "full" && <Route path="/end" element={<End />}></Route>}
         </Routes>
       </div>
     </BrowserRouter>

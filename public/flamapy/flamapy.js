@@ -59,4 +59,10 @@ class Flamapy {
   answer_question(answer)`);
     return JSON.parse(result);
   }
+
+  async undoAnswer() {
+    const result = await this.pyodide.runPythonAsync(`
+  undo_answer()`);
+    return JSON.parse(result);
+  }
 }

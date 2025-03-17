@@ -3,16 +3,18 @@ import { useState, useEffect } from "react";
 import CustomButton from "../components/CustomButton";
 import Question from "../components/Question";
 import { useNavigate } from "react-router-dom";
+import Information from "../components/Information";
+import Configuration from "../components/Configuration";
 
 function Wizzard({ cancelURL = "/", selectedFile }) {
   const [worker, setWorker] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isImported, setIsImported] = useState(false);
-  const [output, setOutput] = useState("");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState([]);
-  const [popUp, setPopUp] = useState(null);
+  const [popUp, setPopUp] = useState({ type: "info", msg: "Loading flamapy" });
+  const [configuration, setConfiguration] = useState(null);
 
   const navigate = useNavigate();
 
@@ -21,10 +23,15 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     flamapyWorker.onmessage = (event) => {
       if (event.data.status === "loaded") {
         setIsLoaded(true);
-        setOutput("flamapy ready");
-        setOutput(selectedFile.name);
+        setPopUp({
+          type: "info",
+          msg: `Preparing configurator for ${selectedFile.name}`,
+        });
       } else {
-        setOutput("flamapy error");
+        setPopUp({
+          type: "error",
+          msg: `There was an error initializing the configurator`,
+        });
       }
     };
     setWorker(flamapyWorker);
@@ -38,13 +45,12 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
         flamapyWorker.terminate();
       };
     } catch (error) {
-      setOutput(error.toString());
+      setPopUp({
+        type: "error",
+        msg: error.toString(),
+      });
     }
   }, []);
-
-  useEffect(() => {
-    console.log(output);
-  }, [output]);
 
   useEffect(() => {
     if (selectedFile && isLoaded) {
@@ -66,16 +72,16 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
         worker.onmessage = async (event) => {
           if (event.data.results !== undefined) {
             setIsImported(true);
-            setOutput("model imported");
           } else if (event.data.error) {
             if (event.data.error.includes("not_supported")) {
-              setOutput(
-                "Import error The provided file extension is not a supported model. Please try with a model in one of the following types: .gfm.json, .afm, .fide, .json, .xml or .uvl"
-              );
+              setPopUp({
+                type: "error",
+                msg: "Import error: the provided file extension is not a supported model. Please try with a model in one of the following types: .gfm.json, .afm, .fide, .json, .xml or .uvl",
+              });
             } else {
-              setOutput({
-                label: "Import error",
-                result: `There was an error when trying to import the model. Please make sure that the model is valid, and try again.`,
+              setPopUp({
+                type: "error",
+                msg: "There was an error when trying to import the model. Please make sure that the model is valid, and try again.",
               });
             }
             setIsImported(true);
@@ -95,12 +101,11 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
 
       worker.onmessage = async (event) => {
         if (event.data.results !== undefined) {
-          setOutput(event.data.results);
+          setPopUp(null);
           setCurrentQuestion(event.data.results);
         }
       };
     }
-    console.log(output);
   }, [isImported]);
 
   async function answerQuestion() {
@@ -112,7 +117,12 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
           const results = event.data.results;
           if (results.valid) {
             if (results.configuration) {
-              console.log(results.configuration);
+              setConfiguration(results.configuration);
+              setPopUp({
+                type: "success",
+                msg: "Configuration finished successfully",
+              });
+              setCurrentQuestion(null);
             } else {
               setCurrentQuestion(event.data.results.nextQuestion);
               setPopUp(null);
@@ -126,27 +136,36 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
     }
   }
 
+  async function undoAnswer() {
+    if (isImported) {
+      worker.postMessage({ action: "undoAnswer" });
+
+      worker.onmessage = async (event) => {
+        const results = event.data.results;
+        setCurrentQuestion(results);
+        if (configuration) setConfiguration(null);
+        setSelectedAnswer([]);
+      };
+    }
+  }
+
   async function nextQuestion() {
     if (isImported) {
       await answerQuestion();
     }
   }
 
-  function previousQuestion() {}
+  async function previousQuestion() {
+    if (isImported) {
+      await undoAnswer();
+    }
+  }
 
   return (
     <div className="flex flex-col h-screen">
       {/* Main content area */}
-      <div className="bg-neutral-300 flex flex-col  flex-grow rounded-2xl m-2 p-4">
-        {popUp && (
-          <div
-            className={`${
-              popUp.type === "error" ? "bg-red-700" : "bg-green-600"
-            } w-full rounded-xl p-4 text-xl mb-2`}
-          >
-            <p className="text-lg font-semibold text-white">{popUp.msg}</p>
-          </div>
-        )}
+      <div className="bg-neutral-300 flex flex-col  flex-grow rounded-2xl m-2 p-4 max-h-full">
+        {popUp && <Information type={popUp.type} msg={popUp.msg} />}
         {currentQuestion && (
           <Question
             title={currentQuestion.currentQuestion}
@@ -156,6 +175,7 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
             onUpdate={setSelectedAnswer}
           />
         )}
+        {configuration && <Configuration configuration={configuration} />}
       </div>
 
       {/* Footer with buttons */}

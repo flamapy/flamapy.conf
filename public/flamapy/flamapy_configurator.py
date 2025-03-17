@@ -51,13 +51,15 @@ def answer_question(answer):
     result = dict()
     result['valid'] = valid
     if valid:
-        if configurator.is_last_question():
-            result['configuration'] = configurator._get_configuration()
-        else:
-            configurator.next_question()
+        if configurator.next_question():
             result['nextQuestion'] = configurator.get_current_status()
-        
+        else:
+            result['configuration'] = configurator._get_configuration()
     else:
         result['contradiction'] = {'msg': 'The selected choice is incompatible with the model definition. Please choose another option.'}
     
     return json.dumps(result)
+
+def undo_answer():
+    configurator.previous_question()
+    return json.dumps(configurator.get_current_status())

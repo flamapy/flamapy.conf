@@ -25,6 +25,8 @@ self.onmessage = async (event) => {
       results = await self.flamapy.startConfigurator();
     } else if (action === "answerQuestion") {
       results = await self.flamapy.answerQuestion(data);
+    } else if (action === "undoAnswer") {
+      results = await self.flamapy.undoAnswer();
     }
 
     self.postMessage({ results, action });
