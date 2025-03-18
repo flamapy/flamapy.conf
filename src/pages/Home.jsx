@@ -47,7 +47,7 @@ function Home({ setSelectedFile }) {
       <p className="text-lg font-semibold">
         {appMode === "full"
           ? "Select the feature model to configure"
-          : `The configurator will work on: ${modelName}`}
+          : `From this page, you can start the configuration process for ${modelName}. Once finished, you can apply your configuration.`}
       </p>
 
       {appMode === "full" ? (
