@@ -4,8 +4,13 @@ import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
 
 function Home({ setSelectedFile }) {
+  const appMode = import.meta.env?.VITE_FLAMAPY_CONF_MODE;
+  const modelName = import.meta.env?.VITE_FEATURE_MODEL_NAME;
+  const modelURL = import.meta.env?.VITE_FEATURE_MODEL_URL;
+
   const navigate = useNavigate();
   const [fileName, setFileName] = useState("");
+  const [fetchError, setFetchError] = useState(false);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -15,37 +20,67 @@ function Home({ setSelectedFile }) {
     }
   };
 
+  const handleModelImport = (url) => {
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch model");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const urlParts = url.split(".");
+        const fileExtension = urlParts[urlParts.length - 1];
+        const file = new File([blob], `${modelName}.${fileExtension}`, {
+          type: blob.type,
+        });
+        setSelectedFile(file);
+        navigate("/wizzard");
+      })
+      .catch(() => {
+        setFetchError(true);
+      });
+  };
+
   return (
     <div className="bg-neutral-300 flex flex-col items-center justify-center h-screen rounded-2xl m-2 p-4 gap-4">
-      {/* Título */}
       <p className="text-lg font-semibold">
-        Select the feature model to configure
+        {appMode === "full"
+          ? "Select the feature model to configure"
+          : `The configurator will work on: ${modelName}`}
       </p>
 
-      <input
-        type="file"
-        id="fileInput"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
-      <CustomButton
-        onClick={() => document.getElementById("fileInput").click()}
-      >
-        Import Model
-      </CustomButton>
-
-      {fileName && (
-        <p className="text-sm text-gray-700">Selected file: {fileName}</p>
+      {appMode === "full" ? (
+        <>
+          <input
+            type="file"
+            id="fileInput"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          <CustomButton
+            onClick={() => document.getElementById("fileInput").click()}
+          >
+            Import Model
+          </CustomButton>
+          {fileName && (
+            <>
+              <p className="text-sm text-gray-700">Selected file: {fileName}</p>
+              <CustomButton onClick={() => navigate("/wizzard")}>
+                Start Configuration
+              </CustomButton>
+            </>
+          )}
+        </>
+      ) : fetchError ? (
+        <p className="text-red-500">
+          Error fetching the model. Please try again.
+        </p>
+      ) : (
+        <CustomButton onClick={() => handleModelImport(modelURL)}>
+          Start Configuration
+        </CustomButton>
       )}
-
-      <p className="text-lg font-semibold">Select configuration format</p>
-      <select className="p-2 border rounded w-max text-white py-2 px-4 m-2 shadow-lg transition-colors duration-200 bg-[#356C99] hover:bg-[#0D486C]">
-        <option defaultValue>JSON</option>
-      </select>
-
-      <CustomButton onClick={() => navigate("/wizzard")}>
-        Start Configuration
-      </CustomButton>
     </div>
   );
 }

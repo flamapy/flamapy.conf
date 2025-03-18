@@ -6,7 +6,10 @@ import { useNavigate } from "react-router-dom";
 import Information from "../components/Information";
 import Configuration from "../components/Configuration";
 
-function Wizzard({ cancelURL = "/", selectedFile }) {
+function Wizzard({ selectedFile }) {
+  const cancelURL = import.meta.env?.VITE_CANCEL_CONFIGURATION_URL;
+  const applyURL = import.meta.env?.VITE_APPLY_CONFIGURATION_URL;
+
   const [worker, setWorker] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isImported, setIsImported] = useState(false);
@@ -169,6 +172,8 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
   async function nextQuestion() {
     if (isImported && currentQuestion) {
       await answerQuestion();
+    } else if (applyURL) {
+      applyConfiguration();
     } else {
       downloadConfiguration();
     }
@@ -201,10 +206,10 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
       <div className="flex justify-between p-4">
         <CustomButton
           onClick={() => {
-            if (cancelURL.startsWith("http")) {
+            if (cancelURL?.startsWith("http")) {
               window.location.href = cancelURL; // Redirects to external URL
             } else {
-              navigate(cancelURL); // Internal navigation
+              navigate("/"); // Internal navigation
             }
           }}
         >
@@ -225,7 +230,11 @@ function Wizzard({ cancelURL = "/", selectedFile }) {
               nextQuestion();
             }}
           >
-            {configuration ? "Download configuration" : "Next"}
+            {configuration
+              ? applyURL
+                ? "Apply configuration"
+                : "Download configuration"
+              : "Next"}
           </CustomButton>
         </div>
       </div>

@@ -5,14 +5,6 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Wizzard from "./pages/Wizzard";
 
-const appMode = import.meta.env.VITE_FLAMAPY_CONF_MODE;
-const cancelURL =
-  appMode === "embed"
-    ? import.meta.env.VITE_CANCEL_CONFIGURATION_URL
-    : undefined;
-const applyURL =
-  appMode === "embed" ? import.meta.env.VITE_APPLY_CONFIGURATION_URL : null;
-
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -21,17 +13,14 @@ function App() {
       <div className="h-screen w-screen flex flex-col">
         <Navbar />
         <Routes>
-          {appMode === "full" && (
-            <Route
-              path="/"
-              element={<Home setSelectedFile={setSelectedFile} />}
-            ></Route>
-          )}
           <Route
-            path="/wizzard"
-            element={
-              <Wizzard cancelURL={cancelURL} selectedFile={selectedFile} />
-            }
+            path="/"
+            element={<Home setSelectedFile={setSelectedFile} />}
+          ></Route>
+
+          <Route
+            path={"/wizzard"}
+            element={<Wizzard selectedFile={selectedFile} />}
           ></Route>
         </Routes>
       </div>
