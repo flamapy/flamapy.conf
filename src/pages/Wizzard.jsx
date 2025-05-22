@@ -7,9 +7,8 @@ import Information from "../components/Information";
 import Configuration from "../components/Configuration";
 import sendPostRequest from "../requests/sendPostRequest";
 
-function Wizzard({ selectedFile }) {
+function Wizzard({ selectedFile, applyURL = false }) {
   const cancelURL = import.meta.env?.VITE_CANCEL_CONFIGURATION_URL;
-  const applyURL = import.meta.env?.VITE_APPLY_CONFIGURATION_URL;
 
   const [worker, setWorker] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -26,7 +25,9 @@ function Wizzard({ selectedFile }) {
   const navigate = useNavigate();
 
   function initializeWorker() {
-    const flamapyWorker = new Worker("/webworker.js");
+    const flamapyWorker = new Worker(
+      import.meta.env?.VITE_ASSETS + "webworker.js"
+    );
     flamapyWorker.onmessage = (event) => {
       if (event.data.status === "loaded") {
         setIsLoaded(true);

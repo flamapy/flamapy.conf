@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-importScripts("/pyodide/pyodide.js");
+importScripts(__BASE_PATH__  +"pyodide/pyodide.js");
 
 class Flamapy {
   constructor() {
@@ -9,7 +9,7 @@ class Flamapy {
   }
 
   async loadFlamapy() {
-    const pythonFile = await fetch("/flamapy/flamapy_configurator.py");
+    const pythonFile = await fetch(__BASE_PATH__  +"flamapy/flamapy_configurator.py");
     const pyodideInstance = await loadPyodide({
       indexURL: "pyodide",
     });
@@ -51,7 +51,7 @@ class Flamapy {
     const result = await this.pyodide.runPythonAsync(`
   start_configurator()`);
     return JSON.parse(result);
-  }
+  } 
 
   async answerQuestion(answer) {
     this.pyodide.globals.set("answer", answer);

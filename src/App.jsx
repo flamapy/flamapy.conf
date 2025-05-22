@@ -7,20 +7,28 @@ import Wizzard from "./pages/Wizzard";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [applyURL, setApplyURL] = useState(null);
 
   return (
-    <BrowserRouter basename="/">
+    <BrowserRouter basename={import.meta.env?.VITE_BASENAME}>
       <div className="h-screen w-screen flex flex-col">
         <Navbar />
         <Routes>
           <Route
             path="/"
-            element={<Home setSelectedFile={setSelectedFile} />}
+            element={
+              <Home
+                setSelectedFile={setSelectedFile}
+                setApplyURL={setApplyURL}
+              />
+            }
           ></Route>
 
           <Route
             path={"/wizzard"}
-            element={<Wizzard selectedFile={selectedFile} />}
+            element={
+              <Wizzard selectedFile={selectedFile} applyURL={applyURL} />
+            }
           ></Route>
         </Routes>
       </div>

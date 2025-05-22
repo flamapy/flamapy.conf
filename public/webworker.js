@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-importScripts("/flamapy/flamapy.js");
+importScripts(__BASE_PATH__  +"flamapy/flamapy.js");
 async function loadFlamapyWorker() {
   self.flamapy = new Flamapy();
   await self.flamapy.loadFlamapy();

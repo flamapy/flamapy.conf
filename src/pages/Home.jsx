@@ -1,16 +1,25 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
+import { useSearchParams } from "react-router";
 
-function Home({ setSelectedFile }) {
+function Home({ setSelectedFile, setApplyURL }) {
   const appMode = import.meta.env?.VITE_FLAMAPY_CONF_MODE;
   const modelName = import.meta.env?.VITE_FEATURE_MODEL_NAME;
-  const modelURL = import.meta.env?.VITE_FEATURE_MODEL_URL;
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [fileName, setFileName] = useState("");
   const [fetchError, setFetchError] = useState(false);
+
+  const modelURL = searchParams.get("modelURL");
+
+  useEffect(() => {
+    console.log(searchParams.get("applyURL"));
+
+    setApplyURL(searchParams.get("applyURL"));
+  }, [searchParams]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
