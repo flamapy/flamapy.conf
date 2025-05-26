@@ -20,7 +20,8 @@ function Wizzard({ selectedFile, applyURL = false }) {
     msg: `Preparing configurator for ${selectedFile.name}`,
   });
   const [configuration, setConfiguration] = useState(null);
-  const [popUp, setPopUp] = useState(null);
+  const [isApplied, setIsApplied] = useState(false);
+  const [configurationURL, setConfigurationURL] = useState(null);
 
   const navigate = useNavigate();
 
@@ -172,12 +173,25 @@ function Wizzard({ selectedFile, applyURL = false }) {
     document.body.removeChild(link);
   }
 
-  function applyConfiguration() {
+  async function applyConfiguration() {
+    if (isApplied && configurationURL) {
+      window.location.href = configurationURL;
+      return;
+    }
     sendPostRequest(applyURL, configuration).then((newObjectUrl) => {
       if (newObjectUrl) {
         console.log("New object URL:", newObjectUrl);
+        setMessage({
+          type: "success",
+          msg: "The configuration has been applied successfully",
+        });
+        setIsApplied(true);
+        setConfigurationURL(newObjectUrl);
       } else {
-        console.log("Failed to create object");
+        setMessage({
+          type: "error",
+          msg: "There was an error when trying to apply the configuration. Please try again or download the final configuration.",
+        });
       }
     });
   }
@@ -245,7 +259,9 @@ function Wizzard({ selectedFile, applyURL = false }) {
           >
             {configuration
               ? applyURL
-                ? "Apply configuration"
+                ? isApplied
+                  ? "View Configuration"
+                  : "Apply configuration"
                 : "Download configuration"
               : "Next"}
           </CustomButton>
