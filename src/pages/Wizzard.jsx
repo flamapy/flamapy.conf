@@ -27,8 +27,9 @@ function Wizzard({ selectedFile, applyURL = false }) {
 
   function initializeWorker() {
     const flamapyWorker = new Worker(
-      import.meta.env?.VITE_ASSETS + "webworker.js"
+      import.meta.env?.BASE_URL + "webworker.js"
     );
+    flamapyWorker.postMessage(import.meta.env?.BASE_URL.toString());
     flamapyWorker.onmessage = (event) => {
       if (event.data.status === "loaded") {
         setIsLoaded(true);

@@ -13,10 +13,11 @@ function Home({ setSelectedFile, setApplyURL }) {
   const [fileName, setFileName] = useState("");
   const [fetchError, setFetchError] = useState(false);
 
-  const modelURL = searchParams.get("modelURL");
+  const modelURL =
+    import.meta.env?.VITE_FEATURE_MODEL_URL || searchParams.get("modelURL");
 
   useEffect(() => {
-    console.log(searchParams.get("applyURL"));
+    console.log(appMode);
 
     setApplyURL(searchParams.get("applyURL"));
   }, [searchParams]);

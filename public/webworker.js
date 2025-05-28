@@ -1,37 +1,46 @@
 /* eslint-disable no-undef */
-importScripts(__BASE_PATH__  +"flamapy/flamapy.js");
-async function loadFlamapyWorker() {
-  self.flamapy = new Flamapy();
-  await self.flamapy.loadFlamapy();
-}
-let flamapyReadyPromise = loadFlamapyWorker()
-  .then(() => self.postMessage({ status: "loaded" }))
-  .catch((exception) => self.postMessage({ status: "error", exception }));
+let __BASE_PATH__ = "";
+self.onmessage = function (event) {
+  __BASE_PATH__ = event.data;
 
-self.onmessage = async (event) => {
-  await flamapyReadyPromise;
-  const { action, data, ...context } = event.data;
-  for (const key of Object.keys(context)) {
-    self[key] = context[key];
-  }
-  try {
-    let results;
-    if (action === "importModel") {
-      results = await self.flamapy.importModel(
-        data.fileExtension,
-        data.fileContent
-      );
-    } else if (action === "startConfigurator") {
-      results = await self.flamapy.startConfigurator();
-    } else if (action === "answerQuestion") {
-      results = await self.flamapy.answerQuestion(data);
-    } else if (action === "undoAnswer") {
-      results = await self.flamapy.undoAnswer();
+  if (__BASE_PATH__) {
+    importScripts(__BASE_PATH__ + "flamapy/flamapy.js");
+    async function loadFlamapyWorker() {
+      self.flamapy = new Flamapy();
+      await self.flamapy.loadFlamapy();
     }
+    let flamapyReadyPromise = loadFlamapyWorker()
+      .then(() => self.postMessage({ status: "loaded" }))
+      .catch((exception) => self.postMessage({ status: "error", exception }));
 
-    self.postMessage({ results, action });
-  } catch (error) {
-    console.error(error);
-    self.postMessage({ error: error.message, action });
+    self.onmessage = async (event) => {
+      await flamapyReadyPromise;
+      const { action, data, ...context } = event.data;
+      for (const key of Object.keys(context)) {
+        self[key] = context[key];
+      }
+      try {
+        let results;
+        if (action === "importModel") {
+          results = await self.flamapy.importModel(
+            data.fileExtension,
+            data.fileContent
+          );
+        } else if (action === "startConfigurator") {
+          results = await self.flamapy.startConfigurator();
+        } else if (action === "answerQuestion") {
+          results = await self.flamapy.answerQuestion(data);
+        } else if (action === "undoAnswer") {
+          results = await self.flamapy.undoAnswer();
+        }
+
+        self.postMessage({ results, action });
+      } catch (error) {
+        console.error(error);
+        self.postMessage({ error: error.message, action });
+      }
+    };
+  } else {
+    console.error("Base path not provided to worker");
   }
 };
