@@ -1,52 +1,96 @@
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
+import { useSearchParams } from "react-router";
 
-function Home() {
+function Home({ setSelectedFile, setApplyURL }) {
+  const appMode = import.meta.env?.VITE_FLAMAPY_CONF_MODE;
+  const modelName = import.meta.env?.VITE_FEATURE_MODEL_NAME;
+
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [fileName, setFileName] = useState("");
+  const [fetchError, setFetchError] = useState(false);
+
+  const modelURL =
+    import.meta.env?.VITE_FEATURE_MODEL_URL || searchParams.get("modelURL");
+
+  useEffect(() => {
+    console.log(appMode);
+
+    setApplyURL(searchParams.get("applyURL"));
+  }, [searchParams]);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFileName(file.name);
+    }
+  };
+
+  const handleModelImport = (url) => {
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch model");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const urlParts = url.split(".");
+        const fileExtension = urlParts[urlParts.length - 1];
+        const file = new File([blob], `${modelName}.${fileExtension}`, {
+          type: blob.type,
+        });
+        setSelectedFile(file);
+        navigate("/wizzard");
+      })
+      .catch(() => {
+        setFetchError(true);
+      });
+  };
 
   return (
     <div className="bg-neutral-300 flex flex-col items-center justify-center h-screen rounded-2xl m-2 p-4 gap-4">
-      {/* Título */}
       <p className="text-lg font-semibold">
-        Select the feature model to configure
+        {appMode === "full"
+          ? "Select the feature model to configure"
+          : `From this page, you can start the configuration process for ${modelName}. Once finished, you can apply your configuration.`}
       </p>
 
-      {/* Botón para subir modelo */}
-      <CustomButton onClick={null}>Upload Model</CustomButton>
-
-      {/* Selección del formato */}
-      <p className="text-lg font-semibold">Select configuration format</p>
-      <select className="p-2 border rounded w-max text-white py-2 px-4 m-2 shadow-lg transition-colors duration-200 bg-[#356C99] hover:bg-[#0D486C]">
-        <option defaultValue>JSON</option>
-      </select>
-
-      {/* Instrucciones finales */}
-      <p className="text-lg font-semibold">
-        Once the configuration is finished:
-      </p>
-      <div className="flex flex-col gap-2">
-        {/* Descarga */}
-        <div className="flex items-center gap-2">
-          <input type="checkbox" id="download" name="download" />
-          <label htmlFor="download">Download configuration file</label>
-        </div>
-
-        {/* Enviar a */}
-        <div className="flex items-center gap-2">
-          <input type="checkbox" id="send" name="send" />
-          <label htmlFor="send">Send to:</label>
+      {appMode === "full" ? (
+        <>
           <input
-            type="text"
-            className="p-2 rounded border border-gray-400"
-            placeholder="Enter email or address"
+            type="file"
+            id="fileInput"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
           />
-        </div>
-      </div>
-
-      {/* Botón para empezar configuración */}
-      <CustomButton onClick={() => navigate("/wizzard")}>
-        Start Configuration
-      </CustomButton>
+          <CustomButton
+            onClick={() => document.getElementById("fileInput").click()}
+          >
+            Import Model
+          </CustomButton>
+          {fileName && (
+            <>
+              <p className="text-sm text-gray-700">Selected file: {fileName}</p>
+              <CustomButton onClick={() => navigate("/wizzard")}>
+                Start Configuration
+              </CustomButton>
+            </>
+          )}
+        </>
+      ) : fetchError ? (
+        <p className="text-red-500">
+          Error fetching the model. Please try again.
+        </p>
+      ) : (
+        <CustomButton onClick={() => handleModelImport(modelURL)}>
+          Start Configuration
+        </CustomButton>
+      )}
     </div>
   );
 }

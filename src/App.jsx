@@ -1,21 +1,35 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Wizzard from "./pages/Wizzard";
-import Overview from "./pages/Overview";
-import End from "./pages/End";
 
 function App() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [applyURL, setApplyURL] = useState(null);
+
   return (
-    <BrowserRouter>
-      <div className="h-screen w-screen flex flex-col max-h-screen">
+    <BrowserRouter basename={import.meta.env?.VITE_BASENAME}>
+      <div className="h-screen w-screen flex flex-col">
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/wizzard" element={<Wizzard />}></Route>
-          <Route path="/overview" element={<Overview />}></Route>
-          <Route path="/end" element={<End />}></Route>
+          <Route
+            path="/"
+            element={
+              <Home
+                setSelectedFile={setSelectedFile}
+                setApplyURL={setApplyURL}
+              />
+            }
+          ></Route>
+
+          <Route
+            path={"/wizzard"}
+            element={
+              <Wizzard selectedFile={selectedFile} applyURL={applyURL} />
+            }
+          ></Route>
         </Routes>
       </div>
     </BrowserRouter>

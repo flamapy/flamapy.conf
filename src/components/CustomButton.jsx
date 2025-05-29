@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 function CustomButton({ active = true, onClick, children }) {
   const baseClasses =
     "w-max text-white py-2 px-4 m-2 rounded shadow-lg transition-colors duration-200";
