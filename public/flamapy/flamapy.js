@@ -12,26 +12,29 @@ class Flamapy {
     const pythonFile = await fetch(
       __BASE_PATH__ + "flamapy/flamapy_configurator.py"
     );
-    const pyodideInstance = await loadPyodide({
-      indexURL: "pyodide",
-    });
+    const pyodideInstance = await loadPyodide();
     await pyodideInstance.loadPackage("micropip");
     await pyodideInstance.loadPackage("python-sat");
     await pyodideInstance.runPythonAsync(`
   import micropip
+  await micropip.install("pyodide/MarkupSafe-2.1.5-cp312-cp312-pyodide_2024_0_wasm32.whl", deps=False)
+  await micropip.install("uvengine/jinja2-3.1.6-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/flamapy-2.0.1-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/flamapy_fw-2.0.1-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/flamapy_fm-2.0.1-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/flamapy_sat-2.0.1-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/flamapy_bdd-2.0.1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_fw-2.1.0.dev1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_fm-2.1.0.dev1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_sat-2.1.0.dev1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_bdd-2.1.0.dev1-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/dd-0.5.7-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/ply-3.11-py2.py3-none-any.whl", deps=False)
   await micropip.install("flamapy/astutils-0.0.6-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/graphviz-0.20-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/uvlparser-2.0.1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/uvlparser-2.5.0-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/afmparser-1.0.3-py3-none-any.whl", deps=False)
   await micropip.install("flamapy/antlr4_python3_runtime-4.13.1-py3-none-any.whl", deps=False)
-  await micropip.install("flamapy/flamapy_configurator-2.0.1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_configurator-2.5.1-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/flamapy_z3-2.5.0-py3-none-any.whl", deps=False)
+  await micropip.install("flamapy/z3_solver-4.13.4.0-py3-none-pyodide_2024_0_wasm32.whl", deps=False)
+  await micropip.install("uvengine/uvengine-1.0.4-py3-none-any.whl", deps=False)
   `);
     await pyodideInstance.runPythonAsync(await pythonFile.text());
     pyodideInstance.FS.mkdir("export");
@@ -66,5 +69,20 @@ class Flamapy {
     const result = await this.pyodide.runPythonAsync(`
   undo_answer()`);
     return JSON.parse(result);
+  }
+
+  async generateArtifact(data) {
+    // data: { modelExtension, fileContent, configuration, templateContent }
+    this.pyodide.globals.set("model_extension", data.modelExtension);
+    this.pyodide.globals.set("file_content", data.fileContent);
+    this.pyodide.globals.set("configuration", data.configuration);
+    this.pyodide.globals.set("template_content", data.templateContent);
+
+    // We expect generate_artifact to return a string directly
+    const result = await this.pyodide.runPythonAsync(`
+  generate_artifact(model_extension, file_content, configuration, template_content)
+    `);
+
+    return result;
   }
 }

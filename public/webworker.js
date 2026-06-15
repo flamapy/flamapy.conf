@@ -32,6 +32,8 @@ self.onmessage = function (event) {
           results = await self.flamapy.answerQuestion(data);
         } else if (action === "undoAnswer") {
           results = await self.flamapy.undoAnswer();
+        } else if (action === "generateArtifact") {
+          results = await self.flamapy.generateArtifact(data);
         }
 
         self.postMessage({ results, action });
