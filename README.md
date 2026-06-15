@@ -1,1 +1,1 @@
-# flamapy.conf: Full client-side configurator fro feature models
+# conf.engine: Full client-side configurator for feature models

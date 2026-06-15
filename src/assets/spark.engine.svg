@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 80" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;800&amp;display=swap');
+      .logo-text {
+        font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+        font-size: 44px;
+        letter-spacing: -0.5px;
+      }
+      .font-bold {
+        font-weight: 800;
+      }
+      .font-light {
+        font-weight: 400;
+      }
+    </style>
+
+    <linearGradient id="uvGradient" x1="0" y1="0" x2="350" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9333ea" />  <stop offset="40%" stop-color="#ec4899" /> <stop offset="100%" stop-color="#f97316" /> </linearGradient>
+  </defs>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path 
+      d="M 52.7 27.3 A 18 18 0 1 0 52.7 52.7" 
+      stroke="url(#uvGradient)" 
+      stroke-width="7" 
+    />
+
+    <path 
+      d="M 54 30 Q 54 54 78 54 Q 54 54 54 78 Q 54 54 30 54 Q 54 54 54 30 Z" 
+      fill="url(#uvGradient)" 
+    />
+
+    <path 
+      d="M 74 18 Q 74 26 82 26 Q 74 26 74 34 Q 74 26 66 26 Q 74 26 74 18 Z" 
+      fill="url(#uvGradient)" 
+    />
+
+  </g>
+
+  <text x="95" y="54" fill="url(#uvGradient)" class="logo-text">
+    <tspan class="font-bold">conf</tspan>
+    <tspan class="font-light">.engine</tspan>
+  </text>
+
+</svg>
